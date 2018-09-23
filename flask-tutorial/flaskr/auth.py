@@ -79,8 +79,9 @@ def load_logged_in_user():
         g.user = None
     else:
         g.user = get_db().execute(
-            'SELECT * FROM user WHERE id = ?', (user_id, )
-        )
+            # TODO (user_id, ) 这里有空格也会报错，是啥原因呢？ 估计是数据库语法？得学一学sqlite3
+            'SELECT * FROM user WHERE id = ?', (user_id,)
+        ).fetchone()
 
 
 # logout view
@@ -94,7 +95,7 @@ def login_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None:
-            return redirect(url_for('index'))
+            return redirect(url_for('auth.login'))
         
         return view(**kwargs)
     
